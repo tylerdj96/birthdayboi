@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import { ExternalLink } from "./ExternalLink";
 import { Text, View } from "./Themed";
 
-import Colors from "@/constants/Colors";
+import { colors } from "@/constants";
 
 export default function EditScreenInfo({ path }: { path: string }) {
   return (
@@ -26,11 +26,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
           <Text>{path}</Text>
         </View>
 
-        <Text
-          style={styles.getStartedText}
-          lightColor="rgba(0,0,0,0.8)"
-          darkColor="rgba(255,255,255,0.8)"
-        >
+        <Text style={styles.getStartedText} lightColor="rgba(0,0,0,0.8)">
           Change any of the text, save the file, and your app will automatically
           update.
         </Text>
@@ -41,7 +37,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
           style={styles.helpLink}
           href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet"
         >
-          <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
+          <Text style={styles.helpLinkText} lightColor={colors.light.tint}>
             Tap here if your app doesn't automatically update after making
             changes
           </Text>
@@ -67,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 24,
     textAlign: "center",
-    fontFamily: "Fun",
+    fontFamily: "Inter",
   },
   helpContainer: {
     marginTop: 15,

@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import "@tamagui/core/reset.css";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,8 +9,13 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-
 import { useColorScheme } from "@/components/useColorScheme";
+import { ClerkProvider, SignedIn, useAuth, useSignIn } from "@clerk/clerk-expo";
+import { config } from "@/constants";
+import { SafeAreaView, StyleSheet } from "react-native";
+import { tokenCache } from "@/utils";
+import { TamaguiProvider, View } from "@tamagui/core";
+import tamaguiConfig from "@/tamagui.config";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,7 +32,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Fun: require("../assets/fonts/LilitaOne-Regular.ttf"),
+    Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
+    InterBold: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -44,17 +51,44 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ClerkProvider
+      publishableKey={config.clerkPublishableKey}
+      tokenCache={tokenCache}
+    >
+      <RootLayoutNav />
+    </ClerkProvider>
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const { signIn } = useSignIn();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <TamaguiProvider
+      config={tamaguiConfig}
+      defaultTheme={colorScheme ?? undefined}
+    >
+      {/* <SafeAreaView style={styles.container}> */}
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {signIn?.status === "complete" && (
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        )}
+        {signIn?.status !== "complete" && (
+          <Stack.Screen name="login" options={{ presentation: "modal" }} />
+        )}
       </Stack>
-    </ThemeProvider>
+      {/* </SafeAreaView> */}
+    </TamaguiProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
