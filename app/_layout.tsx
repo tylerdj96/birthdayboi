@@ -1,21 +1,13 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import "@tamagui/core/reset.css";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { config } from "@/constants";
+import { tokenCache } from "@/utils";
+import { ClerkProvider, useSignIn } from "@clerk/clerk-expo";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { useColorScheme } from "@/components/useColorScheme";
-import { ClerkProvider, SignedIn, useAuth, useSignIn } from "@clerk/clerk-expo";
-import { config } from "@/constants";
-import { SafeAreaView, StyleSheet } from "react-native";
-import { tokenCache } from "@/utils";
-import { TamaguiProvider, View } from "@tamagui/core";
-import tamaguiConfig from "@/tamagui.config";
+import { StyleSheet } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -32,8 +24,15 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
-    InterBold: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
+    Fun: require("../assets/fonts/LilitaOne-Regular.ttf"),
+    Regular: require("../assets/fonts/Poppins/Poppins-Regular.ttf"),
+    Thin: require("../assets/fonts/Poppins/Poppins-Thin.ttf"),
+    Light: require("../assets/fonts/Poppins/Poppins-Light.ttf"),
+    Italic: require("../assets/fonts/Poppins/Poppins-Italic.ttf"),
+    Bold: require("../assets/fonts/Poppins/Poppins-Bold.ttf"),
+    Black: require("../assets/fonts/Poppins/Poppins-Black.ttf"),
+    ExtraBold: require("../assets/fonts/Poppins/Poppins-ExtraBold.ttf"),
+    SemiBold: require("../assets/fonts/Poppins/Poppins-SemiBold.ttf"),
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -66,21 +65,16 @@ function RootLayoutNav() {
   const { signIn } = useSignIn();
 
   return (
-    <TamaguiProvider
-      config={tamaguiConfig}
-      defaultTheme={colorScheme ?? undefined}
-    >
-      {/* <SafeAreaView style={styles.container}> */}
+    <ThemeProvider value={DefaultTheme}>
       <Stack>
-        {signIn?.status === "complete" && (
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        )}
-        {signIn?.status !== "complete" && (
-          <Stack.Screen name="login" options={{ presentation: "modal" }} />
-        )}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="sign-in"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+        <Stack.Screen name="sign-up" options={{ presentation: "modal" }} />
       </Stack>
-      {/* </SafeAreaView> */}
-    </TamaguiProvider>
+    </ThemeProvider>
   );
 }
 
