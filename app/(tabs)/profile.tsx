@@ -4,7 +4,7 @@ import React from "react";
 
 const Page = () => {
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Words>Here is some user info</Words>
       <Link href="/sign-in">Login</Link>
     </View>

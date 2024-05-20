@@ -1,11 +1,9 @@
+import { Tabs } from "expo-router";
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
 
 import { colors } from "@/constants";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { useClientOnlyValue } from "@/hooks/useClientOnlyValue";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

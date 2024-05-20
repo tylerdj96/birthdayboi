@@ -1,13 +1,11 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { config } from "@/constants";
-import { tokenCache } from "@/utils";
-import { ClerkProvider, useSignIn } from "@clerk/clerk-expo";
+import { supabase } from "@/supabase/init";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { Session } from "@supabase/supabase-js";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { AppState, StyleSheet } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,6 +19,18 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Tells Supabase Auth to continuously refresh the session automatically if
+// the app is in the foreground. When this is added, you will continue to receive
+// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
+// if the user's session is terminated. This should only be registered once.
+AppState.addEventListener("change", (state) => {
+  if (state === "active") {
+    supabase.auth.startAutoRefresh();
+  } else {
+    supabase.auth.stopAutoRefresh();
+  }
+});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -50,19 +60,23 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <ClerkProvider
-      publishableKey={config.clerkPublishableKey}
-      tokenCache={tokenCache}
-    >
-      <RootLayoutNav />
-    </ClerkProvider>
-  );
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const { signIn } = useSignIn();
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+  }, []);
+
+  console.log(session);
 
   return (
     <ThemeProvider value={DefaultTheme}>
@@ -72,7 +86,10 @@ function RootLayoutNav() {
           name="sign-in"
           options={{ presentation: "modal", headerShown: false }}
         />
-        <Stack.Screen name="sign-up" options={{ presentation: "modal" }} />
+        <Stack.Screen
+          name="sign-up"
+          options={{ presentation: "modal", headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );
